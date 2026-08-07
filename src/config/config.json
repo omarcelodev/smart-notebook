@@ -1,0 +1,13 @@
+{   
+    "version": "0.1.0",
+    "vaults": [
+        "C:\\Users\\marce\\OneDrive\\Documentos\\Teste automação"
+    ],
+    "provider": "ollama",
+    "model": "minimax-m3:cloud ",
+    "delay": 8,
+    "overwrite": false,
+    "extensions": [
+        ".md"
+    ]
+}

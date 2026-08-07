@@ -1,0 +1,88 @@
+from pathlib import Path
+from xml.parsers.expat import model
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from processor import process_file
+import time
+import threading
+
+
+class MarkdownHandler(FileSystemEventHandler):
+
+    def __init__(self, delay=8, model=""):
+        self.delay = delay
+        self.model = model
+        self.timers = {}
+
+    def on_modified(self, event):
+        if event.is_directory:
+            return
+
+        file_path = Path(event.src_path)
+
+        if ".organized" in file_path.stem:
+            return
+
+        if file_path.suffix != ".md":
+            return
+
+        # Cancela o timer anterior desse arquivo
+        if file_path in self.timers:
+            self.timers[file_path].cancel()
+
+        # Cria um novo timer
+        timer = threading.Timer(
+            self.delay,
+            self.process_file,
+            args=[file_path]
+        )
+
+        self.timers[file_path] = timer
+        timer.start()
+
+
+    def process_file(self, file_path):
+        process_file(
+        file_path,
+        self.model
+    )
+
+
+def start_watcher(vaults: list[str], delay=8, model=""):
+
+    event_handler = MarkdownHandler(
+        delay,
+        model
+    )
+    observer = Observer()
+
+    for vault in vaults:
+
+        path = Path(vault)
+
+        if not path.exists():
+            print(f"⚠️ Cofre não encontrado: {vault}")
+            continue
+
+        observer.schedule(
+            event_handler,
+            str(path),
+            recursive=True
+        )
+
+        print(f"👀 Monitorando: {vault}")
+
+
+    observer.start()
+
+
+    try:
+        while True:
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("\nEncerrando...")
+        observer.stop()
+
+
+    observer.join()
