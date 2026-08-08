@@ -46,6 +46,8 @@ class MarkdownHandler(FileSystemEventHandler):
 
 
     def process_file(self, file_path):
+        self.timers.pop(file_path, None)
+
         process_file(
         file_path,
         self.model,
