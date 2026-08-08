@@ -20,12 +20,15 @@ def save_organized_note(
     if output_path.exists() and not overwrite:
         logger.info(f"Nota já existe, pulando: {output_path}")
         return None
-    
-    with open(
-        output_path,
-        "w",
-        encoding="utf-8"
-    ) as file:
-        file.write(content)
+    try:
+        with open(
+            output_path,
+            "w",
+            encoding="utf-8"
+        ) as file:
+            file.write(content)
 
-    return output_path
+    except OSError as e:
+        logger.error(f"Falha ao salvar nota {output_path}: {e}")
+
+        return None

@@ -11,13 +11,17 @@ def read_markdown(file_path: Path) -> str:
     if not file_path.exists():
         logger.warning(f"Arquivo não encontrado: {file_path}")
         return ""
-    
-    with open(
-        file_path,
+    try:
+        with open(
+            file_path,
         "r",
         encoding="utf-8"
-    ) as file:
-        return file.read()
+        ) as file:
+            return file.read()
+        
+    except OSError as e:
+        logger.error(f"Falha ao ler arquivo {file_path}: {e}")
+        return ""
 
 
 
