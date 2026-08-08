@@ -15,6 +15,9 @@ class MarkdownHandler(FileSystemEventHandler):
         self.overwrite = overwrite
         self.timers = {}
 
+    def on_created(self, event):
+        self.on_modified(event)
+
     def on_modified(self, event):
         if event.is_directory:
             return
