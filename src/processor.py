@@ -2,12 +2,14 @@ from pathlib import Path
 from llm import ask_llm
 from output import save_organized_note
 import requests
+import logging
 
+logger = logging.getLogger("smart-notebook")
 
 def read_markdown(file_path: Path) -> str:
 
     if not file_path.exists():
-        print(f"⚠️ Arquivo não encontrado: {file_path}")
+        logger.warning(f"Arquivo não encontrado: {file_path}")
         return ""
     
     with open(
@@ -25,16 +27,16 @@ def process_file(
     overwrite: bool = False
 ):
 
-    print(f"\n📖 Lendo: {file_path}")
+    logger.info(f"Lendo: {file_path}")
 
     content = read_markdown(file_path)
 
     if not content.strip():
-        print(f"⚠️ Conteúdo vazio: {file_path}")
+        logger.warning(f"Conteúdo vazio: {file_path}")
         return
 
-    print("🤖 Enviando para IA...")
-
+    logger.info(f"Enviando conteúdo para IA: {file_path}")
+                
     try:
         organized_content = ask_llm(
             content,
@@ -42,14 +44,14 @@ def process_file(
         )
 
     except requests.RequestException as e:
-        print(f"❌ Falha ao contatar o modelo: {e}")
+        logger.error(f"Falha ao contatar o modelo: {e}")
         return
 
     except ValueError as e:
-        print(f"❌ Resposta inválida do modelo: {e}")
+        logger.error(f"Resposta inválida do modelo: {e}")
         return
 
-    print("💾 Salvando resultado...")
+    logger.info("Salvando resultado")
 
     output = save_organized_note(
         file_path,
@@ -60,4 +62,4 @@ def process_file(
     if output is None:
         return
     
-    print(f"✅ Criado: {output}")
+    logger.info(f"Nota organizada: {output}")

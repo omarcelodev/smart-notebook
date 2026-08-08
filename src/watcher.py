@@ -4,7 +4,9 @@ from watchdog.events import FileSystemEventHandler
 from processor import process_file
 import time
 import threading
+import logging
 
+logger = logging.getLogger("smart-notebook")
 
 class MarkdownHandler(FileSystemEventHandler):
 
@@ -68,7 +70,7 @@ def start_watcher(vaults: list[str], delay=8, model="", overwrite=False):
         path = Path(vault)
 
         if not path.exists():
-            print(f"⚠️ Cofre não encontrado: {vault}")
+            logger.warning(f"Cofre não encontrado: {vault}")
             continue
 
         observer.schedule(
@@ -77,7 +79,7 @@ def start_watcher(vaults: list[str], delay=8, model="", overwrite=False):
             recursive=True
         )
 
-        print(f"👀 Monitorando: {vault}")
+        logger.info(f"Monitorando: {vault}")
 
 
     observer.start()
@@ -88,7 +90,7 @@ def start_watcher(vaults: list[str], delay=8, model="", overwrite=False):
             time.sleep(1)
 
     except KeyboardInterrupt:
-        print("\nEncerrando...")
+        logger.info("Encerrando Smart Notebook")
         observer.stop()
 
 
