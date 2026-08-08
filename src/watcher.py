@@ -1,5 +1,4 @@
 from pathlib import Path
-from xml.parsers.expat import model
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from processor import process_file
@@ -37,7 +36,7 @@ class MarkdownHandler(FileSystemEventHandler):
         # Cria um novo timer
         timer = threading.Timer(
             self.delay,
-            self.process_file,
+            self._run_processing,
             args=[file_path]
         )
 
@@ -45,13 +44,13 @@ class MarkdownHandler(FileSystemEventHandler):
         timer.start()
 
 
-    def process_file(self, file_path):
+    def _run_processing(self, file_path):
         self.timers.pop(file_path, None)
 
         process_file(
-        file_path,
-        self.model,
-        self.overwrite
+            file_path,
+            self.model,
+            self.overwrite
     )
 
 
