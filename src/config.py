@@ -9,7 +9,6 @@ CONFIG_PATH = BASE_DIR / "config" / "config.json"
 class Config(BaseModel):
     version: str
     vaults: list[str]
-    provider: str
     model: str
     delay: int
     overwrite: bool
