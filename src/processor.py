@@ -1,7 +1,7 @@
 from pathlib import Path
-
 from llm import ask_llm
 from output import save_organized_note
+import requests
 
 
 def read_markdown(file_path: Path) -> str:
@@ -34,10 +34,19 @@ def process_file(
 
     print("🤖 Enviando para IA...")
 
-    organized_content = ask_llm(
-        content,
-        model
-    )
+    try:
+        organized_content = ask_llm(
+            content,
+            model
+        )
+
+    except requests.RequestException as e:
+        print(f"❌ Falha ao contatar o modelo: {e}")
+        return
+
+    except ValueError as e:
+        print(f"❌ Resposta inválida do modelo: {e}")
+        return
 
     print("💾 Salvando resultado...")
 

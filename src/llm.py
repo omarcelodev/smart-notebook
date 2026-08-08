@@ -31,5 +31,9 @@ def ask_llm(text: str, model: str) -> str:
     response.raise_for_status()
 
     data = response.json()
+    try:
+        return data["message"]["content"]
+    except (KeyError, TypeError):
+        raise ValueError(f"Formato inesperado da resposta: {data}")
 
     return data["message"]["content"]

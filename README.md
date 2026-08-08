@@ -58,7 +58,7 @@ smartnotebook/
     ├── prompts.py             # system prompt
     ├── config.py              # modelo pydantic + loader
     └── config/
-        └── config.json        # cofres, modelo, delay, extensões
+        └── config.json        # co                                                                                                     fres, modelo, delay, extensões
 ```
 
 ## Configuração
