@@ -13,8 +13,6 @@ class Config(BaseModel):
     model: str
     delay: int
     overwrite: bool
-    extensions: list[str]
-
 
 def load_config() -> Config:
     with open(CONFIG_PATH, "r", encoding="utf-8") as file:
