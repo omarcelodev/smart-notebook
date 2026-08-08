@@ -9,9 +9,10 @@ import threading
 
 class MarkdownHandler(FileSystemEventHandler):
 
-    def __init__(self, delay=8, model=""):
+    def __init__(self, delay=8, model="", overwrite=False):
         self.delay = delay
         self.model = model
+        self.overwrite = overwrite
         self.timers = {}
 
     def on_modified(self, event):
@@ -44,15 +45,17 @@ class MarkdownHandler(FileSystemEventHandler):
     def process_file(self, file_path):
         process_file(
         file_path,
-        self.model
+        self.model,
+        self.overwrite
     )
 
 
-def start_watcher(vaults: list[str], delay=8, model=""):
+def start_watcher(vaults: list[str], delay=8, model="", overwrite=False):
 
     event_handler = MarkdownHandler(
         delay,
-        model
+        model,
+        overwrite
     )
     observer = Observer()
 

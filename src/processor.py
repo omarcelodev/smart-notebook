@@ -21,7 +21,8 @@ def read_markdown(file_path: Path) -> str:
 
 def process_file(
     file_path: Path,
-    model: str
+    model: str,
+    overwrite: bool = False
 ):
 
     print(f"\n📖 Lendo: {file_path}")
@@ -52,7 +53,11 @@ def process_file(
 
     output = save_organized_note(
         file_path,
-        organized_content
+        organized_content,
+        overwrite
     )
 
+    if output is None:
+        return
+    
     print(f"✅ Criado: {output}")

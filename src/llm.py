@@ -35,5 +35,3 @@ def ask_llm(text: str, model: str) -> str:
         return data["message"]["content"]
     except (KeyError, TypeError):
         raise ValueError(f"Formato inesperado da resposta: {data}")
-
-    return data["message"]["content"]

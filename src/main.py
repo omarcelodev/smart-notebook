@@ -17,7 +17,8 @@ def main():
     start_watcher(
         config.vaults,
         config.delay,
-        config.model
+        config.model,
+        config.overwrite
     )
 
 
