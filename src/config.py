@@ -14,7 +14,21 @@ class Config(BaseModel):
     overwrite: bool
 
 def load_config() -> Config:
-    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
-        data = json.load(file)
+    try:
+        data = json.loads(
+            CONFIG_PATH.read_text(
+                encoding="utf-8"
+            )
+        )
+
+    except FileNotFoundError:
+        raise SystemExit(
+            f"❌ Configuração não encontrada: {CONFIG_PATH}"
+        )
+
+    except json.JSONDecodeError as e:
+        raise SystemExit(
+            f"❌ Configuração com JSON inválido: {e}"
+        )
 
     return Config(**data)
