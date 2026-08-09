@@ -1,5 +1,3 @@
-from logging import config
-
 from config import load_config
 from watcher import start_watcher
 from logger import setup_logger

@@ -23,12 +23,12 @@ def load_config() -> Config:
 
     except FileNotFoundError:
         raise SystemExit(
-            f"❌ Configuração não encontrada: {CONFIG_PATH}"
+            f"Configuração não encontrada: {CONFIG_PATH}"
         )
 
     except json.JSONDecodeError as e:
         raise SystemExit(
-            f"❌ Configuração com JSON inválido: {e}"
+            f"Configuração com JSON inválido: {e}"
         )
 
     return Config(**data)
