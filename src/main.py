@@ -13,12 +13,7 @@ def main():
     logger.info(f"Cofres: {len(config.vaults)}")
     logger.info(f"Delay: {config.delay}s")
 
-    start_watcher(
-        config.vaults,
-        config.delay,
-        config.model,
-        config.overwrite
-    )
+    start_watcher(config)
 
 
 if __name__ == "__main__":

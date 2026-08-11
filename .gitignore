@@ -2,3 +2,4 @@ src/config/config.json
 src/__pycache__
 .venv
 ai
+.env

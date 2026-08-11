@@ -1,5 +1,6 @@
 from pathlib import Path
 from time import perf_counter
+from config import Config
 from llm import ask_llm
 from output import organized_path, save_organized_note
 import requests
@@ -32,13 +33,12 @@ def read_markdown(file_path: Path) -> str | None:
 
 def process_file(
     file_path: Path,
-    model: str,
-    overwrite: bool = False
+    config: Config
 ):
 
     output_path = organized_path(file_path)
 
-    if output_path.exists() and not overwrite:
+    if output_path.exists() and not config.overwrite:
         logger.info(f"Nota já organizada, pulando: {output_path}")
         return
 
@@ -60,7 +60,7 @@ def process_file(
     try:
         organized_content = ask_llm(
             content,
-            model
+            config
         )
 
     except requests.RequestException as e:
@@ -76,7 +76,7 @@ def process_file(
     output = save_organized_note(
         file_path,
         organized_content,
-        overwrite
+        config.overwrite
     )
 
     if output is None:

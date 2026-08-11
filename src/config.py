@@ -12,6 +12,8 @@ class Config(BaseModel):
     model: str
     delay: int
     overwrite: bool
+    ollama_url: str = "http://localhost:11434/api/chat"
+    timeout: int = 120
 
 def load_config() -> Config:
     try:

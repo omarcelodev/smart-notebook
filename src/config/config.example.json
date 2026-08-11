@@ -5,5 +5,7 @@
     ],
     "model": "minimax-m3:cloud",
     "delay": 8,
-    "overwrite": false
+    "overwrite": false,
+    "ollama_url": "http://localhost:11434/api/chat",
+    "timeout": 120
 }

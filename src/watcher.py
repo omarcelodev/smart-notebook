@@ -1,6 +1,7 @@
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from config import Config
 from processor import process_file
 import hashlib
 import time
@@ -11,10 +12,8 @@ logger = logging.getLogger("smart-notebook")
 
 class MarkdownHandler(FileSystemEventHandler):
 
-    def __init__(self, delay=8, model="", overwrite=False):
-        self.delay = delay
-        self.model = model
-        self.overwrite = overwrite
+    def __init__(self, config: Config):
+        self.config = config
         self.timers = {}
         self.hashes = {}
         self.processing = set()
@@ -46,7 +45,7 @@ class MarkdownHandler(FileSystemEventHandler):
 
         # Cria um novo timer
         timer = threading.Timer(
-            self.delay,
+            self.config.delay,
             self._run_processing,
             args=[file_path]
         )
@@ -96,8 +95,7 @@ class MarkdownHandler(FileSystemEventHandler):
         try:
             process_file(
                 file_path,
-                self.model,
-                self.overwrite
+                self.config
             )
 
             with self.lock:
@@ -111,18 +109,14 @@ class MarkdownHandler(FileSystemEventHandler):
                 self.processing.discard(file_path)
 
 
-def start_watcher(vaults: list[str], delay=8, model="", overwrite=False):
+def start_watcher(config: Config):
 
-    event_handler = MarkdownHandler(
-        delay,
-        model,
-        overwrite
-    )
+    event_handler = MarkdownHandler(config)
     observer = Observer()
 
     monitored = 0
 
-    for vault in vaults:
+    for vault in config.vaults:
 
         path = Path(vault)
 

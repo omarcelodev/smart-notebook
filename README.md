@@ -41,7 +41,7 @@ Fluxo linear, sem framework web e sem banco de dados:
 1. `main.py` carrega e valida o `config.json` e inicia um `Observer` do `watchdog` para cada cofre existente. Se nenhum cofre for válido, o app encerra.
 2. Ao detectar criação/modificação de um `.md` cujo nome **não** contenha `.organized`, o handler cancela o timer anterior daquele arquivo e agenda um novo para `delay` segundos.
 3. Quando o timer dispara, o handler calcula o hash do arquivo. Se for igual ao último processado, ignora.
-4. `processor.process_file` verifica se a saída já existe (respeitando `overwrite`), lê o Markdown e envia `{system, user}` para `POST http://localhost:11434/api/chat` com `stream: false` e timeout de 120 s.
+4. `processor.process_file` verifica se a saída já existe (respeitando `overwrite`), lê o Markdown e envia `{system, user}` para `POST <ollama_url>` com `stream: false` e o `timeout` definido na configuração.
 5. A resposta é gravada como `<nome>.organized.md` na mesma pasta do original.
 
 Módulos:
@@ -51,7 +51,7 @@ Módulos:
 | `src/main.py` | Ponto de entrada: carrega config, loga o resumo e inicia o watcher. |
 | `src/watcher.py` | `FileSystemEventHandler` com debounce, hash e controle de concorrência. |
 | `src/processor.py` | Lê o `.md`, chama o LLM, trata erros e delega a gravação. |
-| `src/llm.py` | Cliente HTTP do Ollama (`/api/chat`). |
+| `src/llm.py` | Cliente HTTP do Ollama (`/api/chat`), com URL e timeout vindos da config. |
 | `src/output.py` | Monta o caminho `<nome>.organized.md` e salva o resultado. |
 | `src/config.py` | Modelo `pydantic` + carregamento do `config.json`. |
 | `src/prompts.py` | `SYSTEM_PROMPT` do organizador de notas. |
@@ -81,7 +81,7 @@ smartnotebook/
 
 - Windows (desenvolvido e testado no Windows 11).
 - Python 3.13.
-- [Ollama](https://ollama.com) instalado e rodando em `http://localhost:11434`, com o modelo já baixado.
+- [Ollama](https://ollama.com) instalado e rodando (por padrão em `http://localhost:11434`), com o modelo já baixado.
 - Dependências Python: `watchdog`, `requests`, `pydantic`.
 
 ## Instalação
@@ -108,19 +108,23 @@ copy src\config\config.example.json src\config\config.json
     ],
     "model": "minimax-m3:cloud",
     "delay": 8,
-    "overwrite": false
+    "overwrite": false,
+    "ollama_url": "http://localhost:11434/api/chat",
+    "timeout": 120
 }
 ```
 
-| Campo | Tipo | Descrição |
-|---|---|---|
-| `version` | `string` | Versão do arquivo de configuração. |
-| `vaults` | `string[]` | Caminhos absolutos dos cofres a monitorar (barras invertidas escapadas). Cofres inexistentes são avisados e ignorados. |
-| `model` | `string` | Nome do modelo conforme o `ollama list`. |
-| `delay` | `int` | Segundos de espera após a última modificação antes de processar (debounce). |
-| `overwrite` | `bool` | Se `true`, reprocessa e sobrescreve o `.organized.md` existente. |
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `version` | `string` | sim | Versão do arquivo de configuração. |
+| `vaults` | `string[]` | sim | Caminhos absolutos dos cofres a monitorar (barras invertidas escapadas). Cofres inexistentes são avisados e ignorados. |
+| `model` | `string` | sim | Nome do modelo conforme o `ollama list`. |
+| `delay` | `int` | sim | Segundos de espera após a última modificação antes de processar (debounce). |
+| `overwrite` | `bool` | sim | Se `true`, reprocessa e sobrescreve o `.organized.md` existente. |
+| `ollama_url` | `string` | não | Endpoint de chat do Ollama. Default: `http://localhost:11434/api/chat`. Útil para apontar para o Ollama de outra máquina ou porta. |
+| `timeout` | `int` | não | Segundos de espera pela resposta do modelo. Default: `120`. |
 
-Todos os campos são obrigatórios: o `pydantic` falha na inicialização se algum estiver faltando ou com o tipo errado.
+Os cinco primeiros campos são obrigatórios: o `pydantic` falha na inicialização se algum estiver faltando ou com o tipo errado. `ollama_url` e `timeout` podem ser omitidos e caem no default.
 
 ## Como executar
 
@@ -137,7 +141,7 @@ O console mostra o modelo, a quantidade de cofres, o delay e depois cada arquivo
 
 ## Limitações
 
-- Apenas Ollama é suportado; a URL está fixa em `src/llm.py`.
+- Apenas Ollama é suportado (a URL é configurável, mas o formato de payload e resposta é o da API do Ollama).
 - Arquivos gerados pelo app são filtrados pelo nome (`.organized`), não por metadados — renomear manualmente pode causar reprocessamento.
 - Sem fila persistente: se o app for encerrado durante o debounce, o evento é perdido. O cache de hashes também vive apenas em memória.
 - Só processa arquivos em UTF-8; outros encodings são registrados como erro e ignorados.

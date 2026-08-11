@@ -1,14 +1,12 @@
 import requests
+from config import Config
 from prompts import SYSTEM_PROMPT
 
 
-OLLAMA_URL = "http://localhost:11434/api/chat"
-
-
-def ask_llm(text: str, model: str) -> str:
+def ask_llm(text: str, config: Config) -> str:
 
     payload = {
-        "model": model,
+        "model": config.model,
         "messages": [
             {
                 "role": "system",
@@ -23,9 +21,9 @@ def ask_llm(text: str, model: str) -> str:
     }
 
     response = requests.post(
-        OLLAMA_URL,
+        config.ollama_url,
         json=payload,
-        timeout=120
+        timeout=config.timeout
     )
 
     response.raise_for_status()
